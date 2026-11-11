@@ -1,0 +1,416 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<style>:root{color-scheme:light}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>مراجعة الانقسام الخيطي</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&family=IBM+Plex+Sans+Arabic:wght@400;500;600&display=swap">
+<style>
+/* Layout: one narrow reading column, sticky tab bar (مراجعة / تمارين محلولة / اختبار), schematic phase cards in a wrapping grid. */
+:root{
+  --bg:#f5f6fa; --surface:#ffffff; --ink:#1b2236; --muted:#5b6479; --line:#dde1ec;
+  --stain:#b3246f; --stain-soft:#f8e3ee; --teal:#17707f; --teal-soft:#dcf0f3;
+  --ok:#1d7a46; --ok-soft:#dff3e7; --bad:#b4281f; --bad-soft:#fbe3e0;
+  --f-display:'Cairo',system-ui,sans-serif; --f-body:'IBM Plex Sans Arabic','Cairo',system-ui,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#12151f; --surface:#1b2030; --ink:#e8ebf5; --muted:#a0a9bf; --line:#2c3347;
+  --stain:#ee6aa9; --stain-soft:#3a1e30; --teal:#5cc4d4; --teal-soft:#16343a;
+  --ok:#5fd18d; --ok-soft:#173526; --bad:#ff8a80; --bad-soft:#401f1c; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#12151f; --surface:#1b2030; --ink:#e8ebf5; --muted:#a0a9bf; --line:#2c3347;
+  --stain:#ee6aa9; --stain-soft:#3a1e30; --teal:#5cc4d4; --teal-soft:#16343a;
+  --ok:#5fd18d; --ok-soft:#173526; --bad:#ff8a80; --bad-soft:#401f1c; color-scheme:dark}
+*{box-sizing:border-box}
+body{direction:rtl;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.85;
+  padding-block:0 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:760px;margin:0 auto}
+header{padding-block:28px 14px}
+.kicker{font-size:13px;color:var(--stain);font-weight:600;letter-spacing:.04em}
+h1{font-family:var(--f-display);font-weight:800;font-size:clamp(26px,6vw,38px);line-height:1.35;margin:4px 0 6px;text-wrap:balance}
+header p{color:var(--muted);margin:0}
+h2{font-family:var(--f-display);font-weight:800;font-size:22px;margin:32px 0 10px;text-wrap:balance}
+h3{font-family:var(--f-display);font-weight:600;font-size:17px;margin:18px 0 6px;color:var(--teal)}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:9;background:var(--bg);padding-block:8px;border-bottom:1px solid var(--line)}
+nav .tabs{display:flex;gap:6px;max-width:760px;margin:0 auto}
+nav button{flex:1;font:600 15px var(--f-display);padding:10px 6px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--muted);cursor:pointer}
+nav button[aria-selected="true"]{background:var(--stain);color:#fff;border-color:var(--stain)}
+:root[data-theme="dark"] nav button[aria-selected="true"]{color:#1b1020}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) nav button[aria-selected="true"]{color:#1b1020}}
+button:focus-visible,summary:focus-visible{outline:3px solid var(--teal);outline-offset:2px}
+.panel{padding-top:8px}
+.box{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin:12px 0}
+.box.key{background:var(--teal-soft);border-color:transparent}
+.box.warn{background:var(--stain-soft);border-color:transparent}
+ul,ol{padding-inline-start:22px;margin:6px 0}
+li{margin:3px 0}
+table{border-collapse:collapse;width:100%;font-size:15px}
+.tw{overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:var(--surface)}
+th,td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:start;vertical-align:top}
+th{background:var(--teal-soft);font-family:var(--f-display);font-weight:600}
+tr:last-child td{border-bottom:0}
+.phases{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin:12px 0}
+.ph{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 12px;min-width:0}
+.ph svg{width:100%;height:auto;display:block;margin-bottom:6px}
+.ph b{font-family:var(--f-display);color:var(--stain)}
+.ph p{margin:2px 0 0;font-size:14.5px;line-height:1.7;color:var(--muted)}
+details{background:var(--surface);border:1px solid var(--line);border-radius:10px;margin:12px 0;padding:0 16px}
+summary{cursor:pointer;font-family:var(--f-display);font-weight:600;padding:12px 0;list-style:none}
+summary::-webkit-details-marker{display:none}
+summary::before{content:"◂ ";color:var(--stain)}
+details[open] summary::before{content:"▾ "}
+.sol{border-top:1px dashed var(--line);padding:8px 0 12px}
+.sol .tag{display:inline-block;background:var(--ok-soft);color:var(--ok);font:600 13px var(--f-display);padding:0 10px;border-radius:99px}
+.ex{font-weight:500}
+/* quiz */
+.qhead{display:flex;justify-content:space-between;align-items:center;font:600 14px var(--f-display);color:var(--muted);margin:14px 0 6px}
+.bar{height:8px;background:var(--line);border-radius:99px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--teal);width:0;transition:width .3s}
+.q{font-family:var(--f-display);font-weight:600;font-size:18px;line-height:1.7;margin:16px 0 10px}
+.opts{display:grid;gap:8px}
+.opt{text-align:start;font:500 16px var(--f-body);padding:12px 14px;border-radius:10px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;line-height:1.7}
+.opt:hover:not(:disabled){border-color:var(--teal)}
+.opt.ok{background:var(--ok-soft);border-color:var(--ok)}
+.opt.bad{background:var(--bad-soft);border-color:var(--bad)}
+.opt:disabled{cursor:default}
+.fb{margin-top:12px;padding:12px 14px;border-radius:10px;font-size:15.5px}
+.fb.ok{background:var(--ok-soft)} .fb.bad{background:var(--bad-soft)}
+.btn{font:600 16px var(--f-display);padding:11px 22px;border-radius:10px;border:0;background:var(--stain);color:#fff;cursor:pointer;margin-top:12px}
+:root[data-theme="dark"] .btn{color:#1b1020}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .btn{color:#1b1020}}
+.score{font:800 44px var(--f-display);color:var(--stain);line-height:1.2}
+.miss{margin:8px 0;padding:10px 12px;border-radius:10px;background:var(--bad-soft);font-size:15px}
+.dna svg{width:100%;height:auto}
+.vid{display:flex;align-items:center;gap:14px;padding:12px 14px;border-radius:10px;background:var(--teal-soft);color:var(--ink);text-decoration:none;margin-bottom:12px}
+.vid:hover{outline:2px solid var(--teal)}
+.vid small{color:var(--muted)}
+.play{flex:none;width:44px;height:44px;border-radius:50%;background:var(--stain);position:relative}
+.play::after{content:"";position:absolute;top:13px;left:16px;border-style:solid;border-width:9px 0 9px 15px;border-color:transparent transparent transparent var(--bg)}
+.ck{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px solid var(--line);cursor:pointer}
+.ck:last-child{border-bottom:0}
+.ck input{width:20px;height:20px;margin-top:6px;accent-color:var(--teal);flex:none}
+.ck a{color:var(--teal);font-size:14px;margin-inline-start:6px}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.lk{font:600 11px var(--f-body);background:var(--line);color:var(--muted);padding:1px 7px;border-radius:99px;margin-inline-start:4px}
+nav button.open .lk{display:none}
+.lockmsg{border-top:1px dashed var(--line);padding:10px 0 12px;color:var(--muted);font-size:15px}
+body:not(.sols) .sol{display:none}
+body.sols .lockmsg{display:none}
+#toast{position:sticky;top:calc(env(safe-area-inset-top,0px) + 56px);z-index:8}
+svg text{font-family:var(--f-display)}
+@media (prefers-reduced-motion:reduce){.bar i{transition:none}}
+</style>
+
+<div class="wrap">
+<header>
+  <div class="kicker">السنة الأولى ثانوي · علوم الطبيعة والحياة · الفصل الأول</div>
+  <h1>الانقسام الخيطي المتساوي</h1>
+  <p>ملخص الدرس، تمارين مع الحل النموذجي، واختبار إلكتروني يصحّح نفسه.</p>
+</header>
+</div>
+<nav><div class="tabs" role="tablist">
+  <button role="tab" id="t1" aria-selected="true" data-p="p1">المراجعة</button>
+  <button role="tab" id="t3" aria-selected="false" data-p="p3">الاختبار <span class="lk" id="lk3">مقفل</span></button>
+  <button role="tab" id="t2" aria-selected="false" data-p="p2">التمارين والحل <span class="lk" id="lk2">مقفل</span></button>
+</div></nav>
+<div class="wrap"><div id="toast" class="box warn" role="status" hidden></div></div>
+
+<div class="wrap">
+
+<!-- ================= REVIEW ================= -->
+<section class="panel" id="p1">
+  <h2>قائمة المراجعة</h2>
+  <p style="margin:0 0 8px;color:var(--muted)">أنهِ كل البنود لتفتح الاختبار. يفتح الحل النموذجي بعد إنهاء الاختبار.</p>
+  <div class="box">
+    <a class="vid" href="https://youtu.be/1kqVRJuSln8?si=Q_GTqcWg0cUemGdA" target="_blank" rel="noopener">
+      <span class="play" aria-hidden="true"></span>
+      <span><b>فيديو شرح الدرس</b><br><small>يفتح على يوتيوب في نافذة جديدة</small></span>
+    </a>
+    <div id="chk"></div>
+    <div class="qhead"><span id="chkn"></span></div>
+    <div class="bar"><i id="chkbar"></i></div>
+    <button class="btn" id="goquiz" type="button" disabled>الانتقال إلى الاختبار</button>
+  </div>
+
+  <h2 id="s1">1. الدورة الخلوية</h2>
+  <p>هي مجموعة التغيرات التي تطرأ على الخلية بين نشأتها من انقسام وانقسامها من جديد. تتكوّن من مرحلتين:</p>
+  <div class="tw"><table>
+    <tr><th>المرحلة</th><th>المدة</th><th>ما يحدث</th></tr>
+    <tr><td><b>السكون (Interphase)</b></td><td>الأطول</td><td>نمو الخلية وتضاعف الـ ADN. تنقسم إلى G1 وS وG2.</td></tr>
+    <tr><td><b>الانقسام (M)</b></td><td>الأقصر</td><td>انقسام النواة (الانقسام الخيطي) ثم انقسام الهيولى.</td></tr>
+  </table></div>
+  <div class="tw" style="margin-top:12px"><table>
+    <tr><th>الطور</th><th>الحدث</th></tr>
+    <tr><td><b>G1</b></td><td>نمو الخلية وتركيب البروتينات. كل صبغي يتكون من <b>صبيغة واحدة</b> (كمية ADN = 2Q).</td></tr>
+    <tr><td><b>S</b></td><td><b>تضاعف الـ ADN</b>: يصبح كل صبغي مكوّنًا من <b>صبيغتين</b> متماثلتين (كمية ADN: من 2Q إلى 4Q).</td></tr>
+    <tr><td><b>G2</b></td><td>تحضير الخلية للانقسام. كمية ADN = 4Q.</td></tr>
+  </table></div>
+
+  <h2 id="s2">2. تطور كمية الـ ADN خلال الدورة</h2>
+  <div class="box dna">
+    <svg viewBox="0 0 640 260" role="img" aria-label="منحنى كمية ADN في النواة: ثابتة عند 2Q في G1، ترتفع في S إلى 4Q، ثابتة في G2 والانقسام، ثم تعود إلى 2Q بعد الطور الانفصالي والنهائي">
+      <g stroke="var(--line)" stroke-width="1">
+        <line x1="70" y1="40" x2="620" y2="40"/><line x1="70" y1="130" x2="620" y2="130"/>
+      </g>
+      <line x1="70" y1="20" x2="70" y2="210" stroke="var(--muted)" stroke-width="1.5"/>
+      <line x1="70" y1="210" x2="620" y2="210" stroke="var(--muted)" stroke-width="1.5"/>
+      <text x="58" y="45" text-anchor="end" fill="var(--muted)" font-size="15">4Q</text>
+      <text x="58" y="135" text-anchor="end" fill="var(--muted)" font-size="15">2Q</text>
+      <text x="58" y="215" text-anchor="end" fill="var(--muted)" font-size="15">0</text>
+      <polyline points="70,130 190,130 290,40 420,40 460,40 460,130 620,130" fill="none" stroke="var(--stain)" stroke-width="3.5" stroke-linejoin="round"/>
+      <g stroke="var(--muted)" stroke-dasharray="4 4" stroke-width="1">
+        <line x1="190" y1="20" x2="190" y2="210"/><line x1="290" y1="20" x2="290" y2="210"/><line x1="420" y1="20" x2="420" y2="210"/>
+      </g>
+      <g fill="var(--ink)" font-size="15" text-anchor="middle">
+        <text x="130" y="232">G1</text><text x="240" y="232">S</text><text x="355" y="232">G2</text><text x="520" y="232">الانقسام (M)</text>
+      </g>
+      <text x="460" y="30" text-anchor="middle" fill="var(--stain)" font-size="13">نهاية الطور الانفصالي</text>
+    </svg>
+    <p style="margin:6px 0 0;color:var(--muted);font-size:14.5px">تتضاعف الكمية في الطور S، وتعود إلى النصف عند فصل الصبيغتين في الطور الانفصالي، فتحتفظ كل خلية بنتة بالكمية 2Q.</p>
+  </div>
+
+  <h2 id="s3">3. مراحل الانقسام الخيطي</h2>
+  <p>رسومات تخطيطية لخلية حيوانية عدد صبغياتها 2n = 4.</p>
+  <div class="phases" id="phases"></div>
+
+  <div class="tw"><table>
+    <tr><th>الطور</th><th>الأحداث الرئيسية</th></tr>
+    <tr><td><b>التمهيدي</b> (Prophase)</td><td>تقصّر الصبغيات وتلتف فتصبح مرئية، كل صبغي بصبيغتين مرتبطتين بالجسيم المركزي (السنترومير). يختفي الغلاف النووي والنوية. يبدأ تشكّل المغزل اللاصبغي (وتتباعد الجسيمات المركزية في الخلية الحيوانية).</td></tr>
+    <tr><td><b>الاستوائي</b> (Metaphase)</td><td>تصطف الصبغيات في المستوى الاستوائي للخلية، متصلة بألياف المغزل. أفضل مرحلة لـ<b>رؤية الصبغيات وعدّها</b> (إنجاز النمط النووي).</td></tr>
+    <tr><td><b>الانفصالي</b> (Anaphase)</td><td>ينقسم السنترومير وتنفصل الصبيغتان، وتهاجر كل صبيغة (أصبحت صبغيًا مستقلًا) نحو قطب مختلف. يتضاعف عدد الصبغيات مؤقتًا.</td></tr>
+    <tr><td><b>النهائي</b> (Telophase)</td><td>تصل الصبغيات إلى القطبين وتنفك التفافاتها (تعود صبغينًا). يعاد تشكيل الغلاف النووي والنوية، ويختفي المغزل، ويبدأ انقسام الهيولى.</td></tr>
+  </table></div>
+
+  <h2 id="s4">4. انقسام الهيولى (Cytokinesis)</h2>
+  <div class="tw"><table>
+    <tr><th></th><th>الخلية الحيوانية</th><th>الخلية النباتية</th></tr>
+    <tr><td><b>آلية الانقسام</b></td><td>اختناق (حلقة انقباض) في وسط الخلية من الخارج نحو الداخل</td><td>تشكّل صفيحة خلوية في الوسط من الداخل نحو الخارج</td></tr>
+    <tr><td><b>الجسيمات المركزية</b></td><td>موجودة وتشكّل النجمة</td><td>غائبة (مغزل بدون نجمة)</td></tr>
+    <tr><td><b>الجدار</b></td><td>لا يوجد جدار</td><td>جدار سيليلوزي جديد يفصل الخليتين</td></tr>
+  </table></div>
+
+  <h2 id="s5">5. النتيجة والأهمية</h2>
+  <div class="box key">
+    <b>النتيجة:</b> تنتج خليتان بنتان <b>متماثلتان وراثيًا</b> مع الخلية الأم، ولهما نفس عدد الصبغيات (2n). يحافظ الانقسام الخيطي على ثبات الصيغة الصبغية عبر الأجيال الخلوية.
+  </div>
+  <ul>
+    <li>النمو (زيادة عدد خلايا الكائن).</li>
+    <li>تعويض الخلايا الميتة وتجديد الأنسجة (كالجلد والدم).</li>
+    <li>الترميم والتئام الجروح.</li>
+    <li>التكاثر اللاجنسي عند بعض الكائنات وحيدة الخلية.</li>
+  </ul>
+
+  <h2 id="s6">6. أعداد الصبغيات والصبيغات (خلية بها 2n)</h2>
+  <div class="tw"><table>
+    <tr><th>المرحلة</th><th>عدد الصبغيات</th><th>عدد الصبيغات</th></tr>
+    <tr><td>G1</td><td>2n</td><td>2n</td></tr>
+    <tr><td>G2، التمهيدي، الاستوائي</td><td>2n</td><td>4n</td></tr>
+    <tr><td>الانفصالي</td><td>4n</td><td>4n</td></tr>
+    <tr><td>النهائي (في كل نواة بنت)</td><td>2n</td><td>2n</td></tr>
+  </table></div>
+  <div class="box warn">تذكّر: عند الإنسان 2n = 46. في الطور الاستوائي: 46 صبغيًا و92 صبيغة. في الطور الانفصالي: 92 صبغيًا.</div>
+</section>
+
+<!-- ================= EXERCISES ================= -->
+<section class="panel" id="p2" hidden>
+  <h2>تمارين مع الحل النموذجي</h2>
+  <p style="color:var(--muted)">حاول الحل أولًا، ثم افتح التصحيح.</p>
+
+  <details>
+    <summary>التمرين 1: تعرّف على الأطوار</summary>
+    <p class="ex">أعطِ اسم الطور المناسب لكل وصف: (أ) تصطف الصبغيات في وسط الخلية. (ب) يختفي الغلاف النووي. (ج) تهاجر الصبيغات نحو القطبين. (د) يظهر غلاف نووي حول كل مجموعة صبغيات.</p>
+    <div class="sol"><span class="tag">الحل</span>
+      <ol><li>(أ) الطور الاستوائي.</li><li>(ب) الطور التمهيدي.</li><li>(ج) الطور الانفصالي.</li><li>(د) الطور النهائي.</li></ol>
+    </div>
+  </details>
+
+  <details>
+    <summary>التمرين 2: عدد الصبغيات والصبيغات</summary>
+    <p class="ex">خلية من ذبابة الخل (<i>Drosophila</i>) عدد صبغياتها 2n = 8. أنجز جدولًا يبيّن عدد الصبغيات وعدد الصبيغات في كل مرحلة: G1، G2، الاستوائي، الانفصالي، وخلية بنت في نهاية الانقسام.</p>
+    <div class="sol"><span class="tag">الحل</span>
+      <div class="tw"><table>
+        <tr><th>المرحلة</th><th>الصبغيات</th><th>الصبيغات</th></tr>
+        <tr><td>G1</td><td>8</td><td>8</td></tr>
+        <tr><td>G2</td><td>8</td><td>16</td></tr>
+        <tr><td>الاستوائي</td><td>8</td><td>16</td></tr>
+        <tr><td>الانفصالي</td><td>16</td><td>16</td></tr>
+        <tr><td>خلية بنت</td><td>8</td><td>8</td></tr>
+      </table></div>
+      <p><b>التفسير:</b> يضاعف الطور S عدد الصبيغات دون تغيير عدد الصبغيات. في الطور الانفصالي ينقسم السنترومير فيصير كل صبيغة صبغيًا مستقلًا، فيتضاعف عدد الصبغيات مؤقتًا.</p>
+    </div>
+  </details>
+
+  <details>
+    <summary>التمرين 3: منحنى كمية الـ ADN</summary>
+    <p class="ex">قيست كمية الـ ADN في نواة خلية خلال دورة خلوية، فكانت: 2Q في G1، ثم ارتفعت تدريجيًا لتبلغ 4Q، وبقيت ثابتة حتى نهاية الطور الاستوائي، ثم انخفضت إلى 2Q. (1) في أي مرحلة ارتفعت الكمية؟ ولماذا؟ (2) متى انخفضت؟ (3) لماذا يجب أن تتضاعف كمية الـ ADN قبل الانقسام؟</p>
+    <div class="sol"><span class="tag">الحل</span>
+      <ol>
+        <li>في الطور <b>S</b> من السكون، بسبب <b>تضاعف الـ ADN</b> (كل صبغي يصنع نسخة مطابقة له فيصير بصبيغتين).</li>
+        <li>عند <b>الطور الانفصالي</b>، لما تنفصل الصبيغتان وتتوزعان على القطبين، ثم تكتمل بعد الطور النهائي مع تشكل النواتين.</li>
+        <li>ليحصل كل من الخليتين البنتين على نسخة كاملة من المعلومات الوراثية، فتبقى كمية الـ ADN وعدد الصبغيات ثابتَين في الخلايا البنت.</li>
+      </ol>
+    </div>
+  </details>
+
+  <details>
+    <summary>التمرين 4: مقارنة خلية حيوانية وخلية نباتية</summary>
+    <p class="ex">اذكر ثلاثة فروق في الانقسام الخيطي بين خلية حيوانية وخلية نباتية.</p>
+    <div class="sol"><span class="tag">الحل</span>
+      <ul>
+        <li>الجسيمات المركزية والنجمة موجودة في الحيوانية وغائبة في النباتية.</li>
+        <li>انقسام الهيولى في الحيوانية <b>باختناق</b>، وفي النباتية <b>بتشكل صفيحة خلوية</b>.</li>
+        <li>الخلية النباتية لها جدار سيليلوزي، فتتشكل بعد الانقسام جدران جديدة بين الخليتين البنتين.</li>
+      </ul>
+    </div>
+  </details>
+
+  <details>
+    <summary>التمرين 5: وضعية إدماجية</summary>
+    <p class="ex">يلتئم جرح في جلد شخص خلال أيام. (1) أي نوع من الانقسام الخلوي مسؤول عن ذلك؟ (2) لماذا تكون الخلايا الجديدة مطابقة وراثيًا للخلايا الأصلية؟ (3) ما عدد الصبغيات في خلية جلدية بنت؟</p>
+    <div class="sol"><span class="tag">الحل</span>
+      <ol>
+        <li>الانقسام الخيطي المتساوي، الذي يعوّض الخلايا المتضررة ويجدّد النسيج.</li>
+        <li>لأن الـ ADN يتضاعف بدقة في الطور S، ثم توزّع الصبيغتان المتماثلتان توزيعًا متساويًا على الخليتين البنتين.</li>
+        <li>46 صبغيًا (2n = 46) كالخلية الأم.</li>
+      </ol>
+    </div>
+  </details>
+</section>
+
+<!-- ================= QUIZ ================= -->
+<section class="panel" id="p3" hidden>
+  <h2>اختبار إلكتروني</h2>
+  <div id="quiz"></div>
+</section>
+</div>
+
+<script>
+document.documentElement.dir='rtl';document.documentElement.lang='ar';
+/* ---------- tabs ---------- */
+var tabs=document.querySelectorAll('nav button');
+var CK=[{id:'v',t:'شاهدتُ فيديو شرح الدرس'},{id:'s1',t:'الدورة الخلوية'},{id:'s2',t:'تطور كمية الـ ADN'},{id:'s3',t:'مراحل الانقسام الخيطي'},{id:'s4',t:'انقسام الهيولى'},{id:'s5',t:'النتيجة والأهمية'},{id:'s6',t:'أعداد الصبغيات والصبيغات'}];
+var st={chk:{},sols:false};
+try{var sv=JSON.parse(localStorage.getItem('mitose-state')||'null');if(sv&&sv.chk){st=sv;}}catch(e){}
+function save(){try{localStorage.setItem('mitose-state',JSON.stringify(st));}catch(e){}}
+function reviewDone(){return CK.every(function(c){return st.chk[c.id];});}
+function toast(m){var t=document.getElementById('toast');t.textContent=m;t.hidden=false;clearTimeout(toast.h);toast.h=setTimeout(function(){t.hidden=true;},4000);}
+function show(p){
+  tabs.forEach(function(x){x.setAttribute('aria-selected',x.dataset.p===p?'true':'false');});
+  ['p1','p2','p3'].forEach(function(id){document.getElementById(id).hidden=(id!==p);});
+  document.getElementById('toast').hidden=true;window.scrollTo(0,0);
+}
+function refresh(){
+  var n=CK.filter(function(c){return st.chk[c.id];}).length,all=n===CK.length;
+  document.getElementById('chkn').textContent='أنجزت '+n+' من '+CK.length+' بنود';
+  document.getElementById('chkbar').style.width=(n/CK.length*100)+'%';
+  document.getElementById('goquiz').disabled=!all;
+  var t3=document.getElementById('t3'),t2=document.getElementById('t2');
+  t3.classList.toggle('open',all);t2.classList.toggle('open',st.sols);
+  document.body.classList.toggle('sols',st.sols);
+}
+document.getElementById('chk').innerHTML=CK.map(function(c){
+  return '<label class="ck"><input type="checkbox" data-k="'+c.id+'"><span>'+c.t+(c.id!=='v'?' <a href="#'+c.id+'">اذهب إلى الفقرة</a>':'')+'</span></label>';}).join('');
+document.querySelectorAll('#chk input').forEach(function(i){
+  i.checked=!!st.chk[i.dataset.k];
+  i.addEventListener('change',function(){st.chk[i.dataset.k]=i.checked;save();refresh();});
+});
+document.querySelectorAll('#chk a').forEach(function(a){a.addEventListener('click',function(e){
+  e.stopPropagation();e.preventDefault();var el=document.getElementById(a.getAttribute('href').slice(1));if(el)el.scrollIntoView({behavior:'smooth'});});});
+document.querySelectorAll('details .ex').forEach(function(p){
+  var d=document.createElement('div');d.className='lockmsg';d.textContent='الحل النموذجي يظهر بعد إنهاء الاختبار الإلكتروني.';p.insertAdjacentElement('afterend',d);});
+tabs.forEach(function(b){b.addEventListener('click',function(){
+  var p=b.dataset.p;
+  if(p==='p3'&&!reviewDone()){toast('أنهِ كل بنود قائمة المراجعة أولًا لتفتح الاختبار.');return;}
+  if(p==='p2'&&!st.sols){toast('يمكنك قراءة نصوص التمارين الآن. يظهر الحل بعد إنهاء الاختبار.');}
+  show(p);
+});});
+document.getElementById('goquiz').addEventListener('click',function(){if(reviewDone())show('p3');});
+function unlockSols(){st.sols=true;save();refresh();}
+refresh();
+
+/* ---------- phase drawings (2n = 4) ---------- */
+var S='stroke="var(--stain)" stroke-width="3" stroke-linecap="round" fill="none"';
+var T='stroke="var(--teal)" stroke-width="3" stroke-linecap="round" fill="none"';
+function X(cx,cy,l,rot,col){ // chromosome of two chromatids
+  var a=rot*Math.PI/180,dx=Math.cos(a)*l,dy=Math.sin(a)*l,nx=-Math.sin(a)*3,ny=Math.cos(a)*3;
+  return '<g '+col+'><line x1="'+(cx-dx+nx)+'" y1="'+(cy-dy+ny)+'" x2="'+(cx+dx+nx)+'" y2="'+(cy+dy+ny)+'"/><line x1="'+(cx-dx-nx)+'" y1="'+(cy-dy-ny)+'" x2="'+(cx+dx-nx)+'" y2="'+(cy+dy-ny)+'"/></g>';
+}
+function one(cx,cy,l,rot,col){var a=rot*Math.PI/180,dx=Math.cos(a)*l,dy=Math.sin(a)*l;
+  return '<line '+col+' x1="'+(cx-dx)+'" y1="'+(cy-dy)+'" x2="'+(cx+dx)+'" y2="'+(cy+dy)+'"/>';}
+function cell(inner,extra){return '<svg viewBox="0 0 200 140" aria-hidden="true"><ellipse cx="100" cy="70" rx="86" ry="58" fill="var(--bg)" stroke="var(--muted)" stroke-width="2"/>'+inner+(extra||'')+'</svg>';}
+var nuc='<circle cx="100" cy="70" r="30" fill="var(--teal-soft)" stroke="var(--teal)" stroke-width="2"/>';
+var spind=function(x){return '<g stroke="var(--muted)" stroke-width="1" opacity=".7"><line x1="30" y1="70" x2="'+x+'" y2="70"/><line x1="170" y1="70" x2="'+(200-x)+'" y2="70"/><line x1="30" y1="70" x2="'+x+'" y2="50"/><line x1="30" y1="70" x2="'+x+'" y2="90"/><line x1="170" y1="70" x2="'+(200-x)+'" y2="50"/><line x1="170" y1="70" x2="'+(200-x)+'" y2="90"/></g>';};
+var P=[
+ {n:'السكون',d:'صبغين غير مرئي داخل نواة محدّدة، ويتضاعف الـ ADN.',
+  s:cell(nuc+'<g fill="none" stroke="var(--stain)" stroke-width="2" stroke-linecap="round"><path d="M85 60q8-10 14 0t14 0"/><path d="M82 72q10 8 16-2t16 4"/><path d="M88 84q8-8 14 0t12-2"/></g>')},
+ {n:'التمهيدي',d:'ظهور الصبغيات، اختفاء الغلاف النووي، بدء تشكل المغزل.',
+  s:cell(spind(55)+X(85,60,16,30,S)+X(115,58,12,-50,S)+X(95,86,16,80,T)+X(120,82,11,10,T))},
+ {n:'الاستوائي',d:'الصبغيات مصطفة على المستوى الاستوائي.',
+  s:cell(spind(78)+'<line x1="100" y1="16" x2="100" y2="124" stroke="var(--muted)" stroke-dasharray="3 4"/>'+X(100,48,15,0,S)+X(100,68,10,0,T)+X(100,88,15,0,S)+X(100,106,10,0,T))},
+ {n:'الانفصالي',d:'انفصال الصبيغتين وهجرتهما نحو القطبين.',
+  s:cell(spind(70)+one(68,48,10,90,S)+one(132,48,10,90,S)+one(68,70,7,90,T)+one(132,70,7,90,T)+one(68,92,10,90,S)+one(132,92,10,90,S)+one(78,60,0.1,90,T))},
+ {n:'النهائي',d:'تشكل نواتين وبداية انقسام الهيولى (اختناق).',
+  s:'<svg viewBox="0 0 200 140" aria-hidden="true"><path d="M100 14C40 6 10 40 14 70c4 32 40 64 86 54 46 10 82-22 86-54 4-30-26-64-86-56z" fill="var(--bg)" stroke="var(--muted)" stroke-width="2" transform="translate(0 0)"/><path d="M100 14 Q96 70 100 126" stroke="var(--muted)" stroke-width="2" fill="none" stroke-dasharray="4 3"/><circle cx="55" cy="70" r="24" fill="var(--teal-soft)" stroke="var(--teal)" stroke-width="2"/><circle cx="145" cy="70" r="24" fill="var(--teal-soft)" stroke="var(--teal)" stroke-width="2"/><g fill="none" stroke="var(--stain)" stroke-width="2" stroke-linecap="round"><path d="M44 62q6-6 10 0t10 0"/><path d="M42 74q8 6 12-2t12 4"/><path d="M134 62q6-6 10 0t10 0"/><path d="M132 74q8 6 12-2t12 4"/></g></svg>'}
+];
+document.getElementById('phases').innerHTML=P.map(function(p){return '<div class="ph">'+p.s+'<b>'+p.n+'</b><p>'+p.d+'</p></div>';}).join('');
+
+/* ---------- quiz ---------- */
+var Q=[
+ {q:'في أي طور من الدورة الخلوية يتضاعف الـ ADN؟',o:['G1','S','G2','الطور التمهيدي'],a:1,e:'يحدث تضاعف الـ ADN في الطور S من السكون، فيصير كل صبغي بصبيغتين.'},
+ {q:'ما الترتيب الصحيح لأطوار الانقسام الخيطي؟',o:['تمهيدي، انفصالي، استوائي، نهائي','تمهيدي، استوائي، انفصالي، نهائي','استوائي، تمهيدي، انفصالي، نهائي','تمهيدي، استوائي، نهائي، انفصالي'],a:1,e:'الترتيب: التمهيدي ثم الاستوائي ثم الانفصالي ثم النهائي.'},
+ {q:'في أي طور تصطف الصبغيات على المستوى الاستوائي للخلية؟',o:['التمهيدي','الاستوائي','الانفصالي','النهائي'],a:1,e:'اصطفاف الصبغيات في الوسط هو ما يميّز الطور الاستوائي، وفيه تُدرس الصبغيات وتُعدّ.'},
+ {q:'ماذا يحدث في الطور الانفصالي؟',o:['يختفي الغلاف النووي','تتضاعف الصبغيات','تنفصل الصبيغتان وتهاجران نحو القطبين','تتشكل النواتان البنتان'],a:2,e:'ينقسم السنترومير وتنفصل الصبيغتان لتتجه كل واحدة إلى قطب.'},
+ {q:'خلية بشرية (2n = 46) في الطور الاستوائي. كم عدد الصبيغات فيها؟',o:['23','46','92','184'],a:2,e:'46 صبغيًا، كل منها بصبيغتين، فالمجموع 92 صبيغة.'},
+ {q:'خلية بشرية (2n = 46) في الطور الانفصالي. كم عدد الصبغيات فيها؟',o:['46','92','23','138'],a:1,e:'بعد انفصال الصبيغات تصير كل صبيغة صبغيًا، فيصبح العدد 92 مؤقتًا.'},
+ {q:'كم صبغيًا في كل خلية بنت بعد الانقسام الخيطي لخلية بشرية جسمية؟',o:['23','46','92','نصف الخلية الأم'],a:1,e:'يحافظ الانقسام الخيطي على العدد 2n = 46 في الخلايا البنتين.'},
+ {q:'الخلايا الناتجة عن الانقسام الخيطي:',o:['مختلفة وراثيًا عن الخلية الأم','متماثلة وراثيًا مع الخلية الأم','نصف عدد صبغيات الأم','عددها أربع خلايا'],a:1,e:'تضاعف الـ ADN ثم التوزيع المتساوي ينتجان خليتين مطابقتين للأم.'},
+ {q:'صحيح أم خطأ: تحتوي الخلية النباتية على جسيمات مركزية تشكّل نجمة أثناء الانقسام.',o:['صحيح','خطأ'],a:1,e:'خطأ. الخلية النباتية بلا جسيمات مركزية ولا نجمة.'},
+ {q:'كيف ينقسم الهيولى في الخلية النباتية؟',o:['باختناق من الخارج','بتشكل صفيحة خلوية من الوسط','بتمزق الغشاء','لا ينقسم'],a:1,e:'تتكون صفيحة خلوية في الوسط تنتهي بجدار فاصل. أما الاختناق ففي الخلية الحيوانية.'},
+ {q:'أي دور مما يلي ليس من أدوار الانقسام الخيطي؟',o:['النمو','تعويض الخلايا التالفة','تشكيل الأمشاج بنصف عدد الصبغيات','التئام الجروح'],a:2,e:'تشكيل الأمشاج (نصف عدد الصبغيات) يتم بالانقسام الاختزالي، لا الخيطي.'},
+ {q:'في أي طور يختفي الغلاف النووي وتظهر الصبغيات؟',o:['G1','التمهيدي','الانفصالي','النهائي'],a:1,e:'في الطور التمهيدي تتكاثف الصبغيات ويختفي الغلاف النووي والنوية.'},
+ {q:'إذا كانت كمية الـ ADN في G1 هي 2Q، فكم تكون في نهاية G2؟',o:['Q','2Q','4Q','8Q'],a:2,e:'تضاعفت الكمية في الطور S فصارت 4Q وبقيت كذلك حتى الطور الانفصالي.'},
+ {q:'صحيح أم خطأ: بعد الطور S يتكون كل صبغي من صبيغتين متماثلتين.',o:['صحيح','خطأ'],a:0,e:'صحيح. الصبيغتان نتيجة تضاعف الـ ADN وترتبطان بالسنترومير.'},
+ {q:'أطول مرحلة في الدورة الخلوية هي:',o:['الطور التمهيدي','الطور الانفصالي','السكون (Interphase)','الطور النهائي'],a:2,e:'يشغل السكون معظم مدة الدورة، أما الانقسام فمرحلة قصيرة.'}
+];
+var qi=0,score=0,wrong=[],locked=false,quiz=document.getElementById('quiz');
+function esc(s){return s;}
+function render(){
+  if(qi>=Q.length){return done();}
+  var q=Q[qi];locked=false;
+  quiz.innerHTML='<div class="qhead"><span>السؤال '+(qi+1)+' من '+Q.length+'</span><span>النقاط: '+score+'</span></div>'+
+   '<div class="bar"><i style="width:'+(qi/Q.length*100)+'%"></i></div>'+
+   '<div class="q">'+q.q+'</div><div class="opts" id="opts"></div><div id="fb"></div>';
+  var box=document.getElementById('opts');
+  q.o.forEach(function(t,i){
+    var b=document.createElement('button');b.className='opt';b.type='button';b.textContent=t;
+    b.addEventListener('click',function(){pick(i);});box.appendChild(b);
+  });
+}
+function pick(i){
+  if(locked)return;locked=true;
+  var q=Q[qi],btns=document.querySelectorAll('.opt'),ok=i===q.a;
+  btns.forEach(function(b,k){b.disabled=true;if(k===q.a)b.classList.add('ok');else if(k===i)b.classList.add('bad');});
+  if(ok)score++;else wrong.push({q:q.q,a:q.o[q.a],e:q.e});
+  document.getElementById('fb').innerHTML='<div class="fb '+(ok?'ok':'bad')+'"><b>'+(ok?'إجابة صحيحة. ':'إجابة خاطئة. ')+'</b>'+q.e+'</div>'+
+    '<button class="btn" id="next" type="button">'+(qi===Q.length-1?'عرض النتيجة':'السؤال التالي')+'</button>';
+  document.getElementById('next').addEventListener('click',function(){qi++;render();window.scrollTo(0,0);});
+  document.getElementById('next').focus();
+}
+function done(){
+  unlockSols();
+  var pct=Math.round(score/Q.length*100);
+  var msg=pct>=85?'ممتاز، أنت جاهز للفرض.':pct>=60?'جيد. راجع النقاط الخاطئة أدناه ثم أعد المحاولة.':'عُد إلى المراجعة ثم أعد الاختبار.';
+  quiz.innerHTML='<div class="box" style="text-align:center"><div class="score">'+score+' / '+Q.length+'</div><div>'+msg+'</div>'+
+   '<button class="btn" id="again" type="button">إعادة الاختبار</button> <button class="btn" id="tosol" type="button">عرض الحل النموذجي للتمارين</button></div>'+
+   (wrong.length?'<h3>أسئلة تحتاج مراجعة</h3>'+wrong.map(function(w){return '<div class="miss"><b>'+w.q+'</b><br>الإجابة: '+w.a+'<br><span style="color:var(--muted)">'+w.e+'</span></div>';}).join(''):'');
+  document.getElementById('tosol').addEventListener('click',function(){show('p2');});
+  document.getElementById('again').addEventListener('click',function(){qi=0;score=0;wrong=[];render();window.scrollTo(0,0);});
+}
+render();
+</script>
+
+</body>
+</html>
